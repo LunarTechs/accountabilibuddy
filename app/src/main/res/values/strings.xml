@@ -1,6 +1,14 @@
 <resources>
     <string name="app_name">AccountabiliBuddy</string>
 
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="prompt_phone">Enter a Phone Number</string>
+    <string name="change_phone">Change Phone Number</string>
+    <string name="saved_phone">Saved Phone Number:  </string>
+    <string name="none">None</string>
+    <string name="button_save">Save</string>
+    <string name="clear">Clear</string>
+    <string name="title_activity_display_message">My Message</string>
+
+    <string name="hello_world">Hello world!</string>
 </resources>
