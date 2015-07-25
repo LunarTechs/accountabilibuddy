@@ -4,28 +4,14 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+
     <LinearLayout
+        android:id="@+id/phone_form"
         android:orientation="horizontal"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/saved_phone" />
-        <TextView
-            android:id="@+id/phone_number"
-            android:layout_weight="1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
-
-        <EditText android:id="@+id/enter_number"
+        <EditText android:id="@+id/phone_number_field"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -38,40 +24,53 @@
             android:text="@string/button_save"
             android:onClick="savePhone" />
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/sending_to" />
+
+        <TextView
+            android:id="@+id/saved_number"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal" />
+
         <Button
             android:id="@+id/clear_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/clear"
             android:onClick="clearPhone" />
+
+        <Button
+            android:id="@+id/change_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/change"
+            android:onClick="changePhone" />
+
     </LinearLayout>
 
-    <!--<LinearLayout
-        android:orientation="vertical"
+    <EditText
+        android:id="@+id/message"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:hint="@string/type_message"/>
 
-      &lt;!&ndash;  <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/saved_phone" />
-            <TextView
-                android:id="@+id/phone_number"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
-        </LinearLayout>&ndash;&gt;
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
-
-
-        </LinearLayout>
-    </LinearLayout>-->
+    <Button
+        android:id="@+id/send_button"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/send"
+        android:onClick="sendMessage" />
 
 </LinearLayout>

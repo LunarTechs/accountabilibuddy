@@ -1,6 +1,7 @@
 package co.lunarlunacy.accountabilibuddy;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -10,22 +11,24 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
-
 
 public class MainActivity extends ActionBarActivity {
 
     public static final String PHONE_NUMBER = "co.lunarlunacy.accountabilibuddy.PHONE_NUMBER";
+    public static final String MESSAGE = "co.lunarlunacy.accountabilibuddy.MESSAGE";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        EditText editText = (EditText) findViewById(R.id.enter_number);
+        // Dynamically format input with phone number styling
+        EditText editText = (EditText) findViewById(R.id.phone_number_field);
         editText.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
 
-        updateLabels();
+        resetUI();
     }
 
     @Override
@@ -53,13 +56,16 @@ public class MainActivity extends ActionBarActivity {
     /**
      * Called when the user clicks the Send button
      */
-    /*public void sendMessage(View view) {
+    public void sendMessage(View view) {
         Intent intent = new Intent(this, DisplayMessageActivity.class);
-        EditText editText = (EditText) findViewById(R.id.prompt_phone);
+        EditText editText = (EditText) findViewById(R.id.message);
         String message = editText.getText().toString();
-        intent.putExtra(EXTRA_MESSAGE, message);
+
+        message = message + "\n" + "\n" + "Sent from AccountabiliBuddy";
+
+        intent.putExtra(MESSAGE, message);
         startActivity(intent);
-    }*/
+    }
 
     /**
      * Called when the user clicks the Save button
@@ -69,7 +75,7 @@ public class MainActivity extends ActionBarActivity {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(PHONE_NUMBER, readPhone());
         editor.commit();
-        updateLabels();
+        resetUI();
     }
 
     /**
@@ -80,11 +86,24 @@ public class MainActivity extends ActionBarActivity {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.remove(PHONE_NUMBER);
         editor.commit();
-        updateLabels();
+        resetUI();
+    }
+
+    /**
+     * Called when the user hits the Change button
+     */
+    public void changePhone(View view) {
+        LinearLayout phonePrompt = (LinearLayout) findViewById(R.id.phone_form);
+        phonePrompt.setVisibility(View.VISIBLE);
+
+        Button changeButton = (Button) findViewById(R.id.change_button);
+        changeButton.setVisibility(View.GONE);
+        Button clearButton = (Button) findViewById(R.id.clear_button);
+        clearButton.setVisibility(View.VISIBLE);
     }
 
     private String readPhone() {
-        EditText editText = (EditText) findViewById(R.id.enter_number);
+        EditText editText = (EditText) findViewById(R.id.phone_number_field);
         return editText.getText().toString();
     }
 
@@ -93,21 +112,38 @@ public class MainActivity extends ActionBarActivity {
         return sharedPref.getString(PHONE_NUMBER, null);
     }
 
-    private void updateLabels() {
+    private void resetUI() {
         String phone = loadPhone();
-        TextView textView = (TextView) findViewById(R.id.phone_number);
-        EditText editText = (EditText) findViewById(R.id.enter_number);
-        Button button = (Button) findViewById(R.id.clear_button);
+
+        TextView savedPhone = (TextView) findViewById(R.id.saved_number);
+        LinearLayout phonePrompt = (LinearLayout) findViewById(R.id.phone_form);
+        Button changeButton = (Button) findViewById(R.id.change_button);
+        EditText message = (EditText) findViewById(R.id.message);
+        Button sendButton = (Button) findViewById(R.id.send_button);
+
         if(phone != null) {
-            textView.setText(phone);
-            editText.setHint(R.string.change_phone);
-            button.setVisibility(View.VISIBLE);
+            savedPhone.setText(phone);
+
+            phonePrompt.setVisibility(View.GONE);
+
+            changeButton.setVisibility(View.VISIBLE);
+
+            message.setVisibility(View.VISIBLE);
+            sendButton.setVisibility(View.VISIBLE);
         } else {
-            textView.setText(R.string.none);
-            editText.setHint(R.string.prompt_phone);
-            button.setVisibility(View.GONE);
+            savedPhone.setText(R.string.none);
+
+            phonePrompt.setVisibility(View.VISIBLE);
+
+            changeButton.setVisibility(View.GONE);
+
+            message.setVisibility(View.INVISIBLE);
+            sendButton.setVisibility(View.INVISIBLE);
         }
-        editText.setText("");
+        Button clearButton = (Button) findViewById(R.id.clear_button);
+        clearButton.setVisibility(View.GONE);
+        EditText phoneTextField = (EditText) phonePrompt.findViewById(R.id.phone_number_field);
+        phoneTextField.setText("");
     }
 
 }
