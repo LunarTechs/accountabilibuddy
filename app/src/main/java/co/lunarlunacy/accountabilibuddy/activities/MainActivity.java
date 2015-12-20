@@ -1,11 +1,13 @@
-package co.lunarlunacy.accountabilibuddy;
+package co.lunarlunacy.accountabilibuddy.activities;
 
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.telephony.PhoneNumberFormattingTextWatcher;
+import android.telephony.SmsManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -13,6 +15,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import co.lunarlunacy.accountabilibuddy.R;
 
 public class MainActivity extends ActionBarActivity {
 
@@ -57,14 +61,24 @@ public class MainActivity extends ActionBarActivity {
      * Called when the user clicks the Send button
      */
     public void sendMessage(View view) {
-        Intent intent = new Intent(this, DisplayMessageActivity.class);
         EditText editText = (EditText) findViewById(R.id.message);
         String message = editText.getText().toString();
+        String messageToSend = appendAppName(message);
+        sendSMS(loadPhone(), messageToSend);
+    }
 
-        message = message + "\n" + "\n" + "Sent from AccountabiliBuddy";
+    private String appendAppName(String message) {
+        return message + "\n" + "\n" + "Sent from AccountabiliBuddy";
+    }
 
+    private void sendSMS(String phoneNumber, String message) {
+        Intent intent = new Intent(this, SentMessageActivity.class);
         intent.putExtra(MESSAGE, message);
-        startActivity(intent);
+        intent.putExtra(PHONE_NUMBER, phoneNumber);
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+        SmsManager sms = SmsManager.getDefault();
+        sms.sendTextMessage(phoneNumber, null, message, pendingIntent, null);
     }
 
     /**

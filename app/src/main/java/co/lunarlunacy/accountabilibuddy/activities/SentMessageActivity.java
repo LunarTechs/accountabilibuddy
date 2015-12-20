@@ -1,27 +1,29 @@
-package co.lunarlunacy.accountabilibuddy;
+package co.lunarlunacy.accountabilibuddy.activities;
 
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 
+import co.lunarlunacy.accountabilibuddy.R;
 
-public class DisplayMessageActivity extends ActionBarActivity {
+public class SentMessageActivity extends ActionBarActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_sent_message);
 
         Intent intent = getIntent();
+        String phone = intent.getStringExtra(MainActivity.PHONE_NUMBER);
         String message = intent.getStringExtra(MainActivity.MESSAGE);
 
-        TextView textView = new TextView(this);
-        textView.setTextSize(40);
-        textView.setText(message);
+        String title = String.format("%s %s", getResources().getString(R.string.sent_to), phone);
+        setTitle(title);
 
-        setContentView(textView);
+        TextView textView = (TextView) findViewById(R.id.send_message);
+        textView.setText(message);
     }
 
     @Override
