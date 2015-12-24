@@ -17,11 +17,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import co.lunarlunacy.accountabilibuddy.R;
+import co.lunarlunacy.accountabilibuddy.daos.BuddyDAO;
+import co.lunarlunacy.accountabilibuddy.utils.Tags;
 
 public class MainActivity extends ActionBarActivity {
 
-    public static final String PHONE_NUMBER = "co.lunarlunacy.accountabilibuddy.PHONE_NUMBER";
-    public static final String MESSAGE = "co.lunarlunacy.accountabilibuddy.MESSAGE";
+    private final BuddyDAO buddyDAO = new BuddyDAO(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +33,7 @@ public class MainActivity extends ActionBarActivity {
         EditText editText = (EditText) findViewById(R.id.phone_number_field);
         editText.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
 
-        resetUI();
+        bindUI();
     }
 
     @Override
@@ -64,7 +65,7 @@ public class MainActivity extends ActionBarActivity {
         EditText editText = (EditText) findViewById(R.id.message);
         String message = editText.getText().toString();
         String messageToSend = appendAppName(message);
-        sendSMS(loadPhone(), messageToSend);
+        sendSMS(buddyDAO.loadPhone(), messageToSend);
     }
 
     private String appendAppName(String message) {
@@ -73,34 +74,33 @@ public class MainActivity extends ActionBarActivity {
 
     private void sendSMS(String phoneNumber, String message) {
         Intent intent = new Intent(this, SentMessageActivity.class);
-        intent.putExtra(MESSAGE, message);
-        intent.putExtra(PHONE_NUMBER, phoneNumber);
+        intent.putExtra(Tags.MESSAGE.getShortName(), message);
+        intent.putExtra(Tags.PHONE_NUMBER.getShortName(), phoneNumber);
 
+        // TODO add a comment?
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
         SmsManager sms = SmsManager.getDefault();
         sms.sendTextMessage(phoneNumber, null, message, pendingIntent, null);
     }
 
     /**
-     * Called when the user clicks the Save button
+     * Called when the user clicks the Save button. <br>
+     * Binds UI again
      */
     public void savePhone(View view) {
-        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(PHONE_NUMBER, readPhone());
-        editor.commit();
-        resetUI();
+        String phoneNumber = readPhone();
+        // TODO add blank phoneNumber checking
+        buddyDAO.savePhone(phoneNumber);
+        bindUI();
     }
 
     /**
-     * Called when the user clicks the Clear button
+     * Called when the user clicks the Clear button <br>
+     * Binds UI again
      */
     public void clearPhone(View view) {
-        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.remove(PHONE_NUMBER);
-        editor.commit();
-        resetUI();
+        buddyDAO.deletePhone();
+        bindUI();
     }
 
     /**
@@ -121,13 +121,8 @@ public class MainActivity extends ActionBarActivity {
         return editText.getText().toString();
     }
 
-    private String loadPhone() {
-        SharedPreferences sharedPref = getPreferences(Context.MODE_PRIVATE);
-        return sharedPref.getString(PHONE_NUMBER, null);
-    }
-
-    private void resetUI() {
-        String phone = loadPhone();
+    private void bindUI() {
+        String phone = buddyDAO.loadPhone();
 
         TextView savedPhone = (TextView) findViewById(R.id.saved_number);
         LinearLayout phonePrompt = (LinearLayout) findViewById(R.id.phone_form);

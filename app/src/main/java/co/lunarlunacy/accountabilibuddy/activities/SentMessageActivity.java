@@ -7,6 +7,7 @@ import android.view.MenuItem;
 import android.widget.TextView;
 
 import co.lunarlunacy.accountabilibuddy.R;
+import co.lunarlunacy.accountabilibuddy.utils.Tags;
 
 public class SentMessageActivity extends ActionBarActivity {
 
@@ -16,8 +17,8 @@ public class SentMessageActivity extends ActionBarActivity {
         setContentView(R.layout.activity_sent_message);
 
         Intent intent = getIntent();
-        String phone = intent.getStringExtra(MainActivity.PHONE_NUMBER);
-        String message = intent.getStringExtra(MainActivity.MESSAGE);
+        String phone = intent.getStringExtra(Tags.PHONE_NUMBER.getShortName());
+        String message = intent.getStringExtra(Tags.MESSAGE.getShortName());
 
         String title = String.format("%s %s", getResources().getString(R.string.sent_to), phone);
         setTitle(title);
