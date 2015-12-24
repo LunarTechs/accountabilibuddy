@@ -17,12 +17,15 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import co.lunarlunacy.accountabilibuddy.R;
+import co.lunarlunacy.accountabilibuddy.connectors.SmsConnector;
 import co.lunarlunacy.accountabilibuddy.daos.BuddyDAO;
+import co.lunarlunacy.accountabilibuddy.models.Buddy;
 import co.lunarlunacy.accountabilibuddy.utils.Tags;
 
 public class MainActivity extends ActionBarActivity {
 
     private final BuddyDAO buddyDAO = new BuddyDAO(this);
+    private final SmsConnector smsConnector = new SmsConnector(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,22 +68,11 @@ public class MainActivity extends ActionBarActivity {
         EditText editText = (EditText) findViewById(R.id.message);
         String message = editText.getText().toString();
         String messageToSend = appendAppName(message);
-        sendSMS(buddyDAO.loadPhone(), messageToSend);
+        smsConnector.sendSMS(buddyDAO.loadPhone().getPhoneNumber(), messageToSend);
     }
 
     private String appendAppName(String message) {
         return message + "\n" + "\n" + "Sent from AccountabiliBuddy";
-    }
-
-    private void sendSMS(String phoneNumber, String message) {
-        Intent intent = new Intent(this, SentMessageActivity.class);
-        intent.putExtra(Tags.MESSAGE.getShortName(), message);
-        intent.putExtra(Tags.PHONE_NUMBER.getShortName(), phoneNumber);
-
-        // TODO add a comment?
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-        SmsManager sms = SmsManager.getDefault();
-        sms.sendTextMessage(phoneNumber, null, message, pendingIntent, null);
     }
 
     /**
@@ -90,7 +82,8 @@ public class MainActivity extends ActionBarActivity {
     public void savePhone(View view) {
         String phoneNumber = readPhone();
         // TODO add blank phoneNumber checking
-        buddyDAO.savePhone(phoneNumber);
+        Buddy buddy = new Buddy(phoneNumber);
+        buddyDAO.savePhone(buddy);
         bindUI();
     }
 
@@ -122,7 +115,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void bindUI() {
-        String phone = buddyDAO.loadPhone();
+        Buddy buddy = buddyDAO.loadPhone();
 
         TextView savedPhone = (TextView) findViewById(R.id.saved_number);
         LinearLayout phonePrompt = (LinearLayout) findViewById(R.id.phone_form);
@@ -130,8 +123,8 @@ public class MainActivity extends ActionBarActivity {
         EditText message = (EditText) findViewById(R.id.message);
         Button sendButton = (Button) findViewById(R.id.send_button);
 
-        if(phone != null) {
-            savedPhone.setText(phone);
+        if(buddy.getPhoneNumber() != null) {
+            savedPhone.setText(buddy.getPhoneNumber());
 
             phonePrompt.setVisibility(View.GONE);
 
