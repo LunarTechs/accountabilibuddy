@@ -1,24 +1,23 @@
 package co.lunarlunacy.accountabilibuddy.models;
 
 /**
- * Created by willepstein on 12/20/15.
+ * Created by willepstein on 1/9/16.
  */
-public class Buddy {
+public class Mission {
 
     private long id;
     private String name;
-    private String phone;
+    private String description;
     private Boolean current;
 
-    // Constructors
-    public Buddy() {
+    public Mission() {
     }
 
-    public Buddy(String name, String phone, Boolean current) {
+    public Mission(long id, String name, String description, Boolean current) {
+        this.id = id;
         this.name = name;
-        this.phone = phone;
+        this.description = description;
         this.current = current;
-
     }
 
     public long getId() {
@@ -37,12 +36,12 @@ public class Buddy {
         this.name = name;
     }
 
-    public String getPhone() {
-        return phone;
+    public String getDescription() {
+        return description;
     }
 
-    public void setPhone(String phone) {
-        this.phone = phone;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public Boolean getCurrent() {
