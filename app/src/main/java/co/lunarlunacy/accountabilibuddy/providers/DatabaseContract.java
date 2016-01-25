@@ -28,15 +28,15 @@ public class DatabaseContract {
          *      _id INTEGER PRIMARY KEY AUTOINCREMENT,  <br>
          *      name TEXT NOT NULL,                     <br>
          *      phone TEXT NOT NULL,                    <br>
-         *      current INTEGER NOT NULL DEFAULT 1      <br>
+         *      current INTEGER NOT NULL DEFAULT 0      <br>
          * );
          */
         public static final String CREATE_TABLE = "CREATE TABLE "
                 + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + KEY_NAME + " TEXT NOT NULL, "
-                + KEY_PHONE + " TEXT, "
-                + KEY_CURRENT + " INTEGER NOT NULL DEFAULT 1)";
+                + KEY_PHONE + " TEXT NOT NULL, "
+                + KEY_CURRENT + " INTEGER NOT NULL DEFAULT 0)";
 
         public static final String DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
     }
@@ -55,14 +55,15 @@ public class DatabaseContract {
          *      _id INTEGER PRIMARY KEY AUTOINCREMENT,  <br>
          *      name TEXT NOT NULL,                     <br>
          *      description TEXT,                       <br>
-         *      current INTEGER NOT NULL DEFAULT 1      <br>
+         *      current INTEGER NOT NULL DEFAULT 0      <br>
          * );
          */
-        public static final String CREATE_TABLE = "CREATE TABLE " + TABLE_NAME + " ("
+        public static final String CREATE_TABLE = "CREATE TABLE "
+                + TABLE_NAME + " ("
                 + _ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
                 + KEY_NAME + " TEXT NOT NULL, "
-                + KEY_DESC + " TEXT, "
-                + KEY_CURRENT + "INTEGER NOT NULL DEFAULT 1)";
+                + KEY_DESC + " TEXT NOT NULL, "
+                + KEY_CURRENT + " INTEGER NOT NULL DEFAULT 0)";
 
         public static final String DELETE_TABLE = "DROP TABLE IF EXISTS " + TABLE_NAME;
     }

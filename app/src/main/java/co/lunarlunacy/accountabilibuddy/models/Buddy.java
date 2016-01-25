@@ -1,16 +1,18 @@
 package co.lunarlunacy.accountabilibuddy.models;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by willepstein on 12/20/15.
  */
-public class Buddy {
+public class Buddy implements Parcelable {
 
     private long id;
     private String name;
     private String phone;
     private Boolean current;
 
-    // Constructors
     public Buddy() {
     }
 
@@ -53,4 +55,34 @@ public class Buddy {
         this.current = current;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel out, int flags) {
+        out.writeLong(id);
+        out.writeString(name);
+        out.writeString(phone);
+        out.writeInt(current != null && current ? 1 : 0);
+    }
+
+    public static final Parcelable.Creator<Buddy> CREATOR = new Parcelable.Creator<Buddy>() {
+        public Buddy createFromParcel(Parcel in) {
+            return new Buddy(in);
+        }
+
+        public Buddy[] newArray(int size) {
+            return new Buddy[size];
+        }
+    };
+
+    // example constructor that takes a Parcel and gives you an object populated with it's values
+    private Buddy(Parcel in) {
+        id = in.readLong();
+        name = in.readString();
+        phone = in.readString();
+        current = in.readInt() > 0 ? Boolean.TRUE : Boolean.FALSE;
+    }
 }

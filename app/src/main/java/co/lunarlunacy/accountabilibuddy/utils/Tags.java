@@ -6,7 +6,9 @@ package co.lunarlunacy.accountabilibuddy.utils;
 public enum Tags {
 
     PHONE_NUMBER("co.lunarlunacy.accountabilibuddy.PHONE_NUMBER", "PHONE_NUMBER"),
-    MESSAGE("co.lunarlunacy.accountabilibuddy.MESSAGE", "MESSAGE");
+    MESSAGE("co.lunarlunacy.accountabilibuddy.MESSAGE", "MESSAGE"),
+    CURRENT_BUDDY("co.lunarlunacy.accountabilibuddy.CURRENT_BUDDY", "CURRENT_BUDDY"),
+    CURRENT_MISSION("co.lunarlunacy.accountabilibuddy.CURRENT_MISSION", "CURRENT_MISSION");
 
     private final String longName;
     private final String shortName;

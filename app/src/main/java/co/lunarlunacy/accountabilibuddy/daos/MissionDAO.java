@@ -8,7 +8,6 @@ import android.database.sqlite.SQLiteDatabase;
 import java.util.ArrayList;
 
 import co.lunarlunacy.accountabilibuddy.models.Mission;
-import co.lunarlunacy.accountabilibuddy.providers.DatabaseHelper;
 
 import static co.lunarlunacy.accountabilibuddy.providers.DatabaseContract.Mission.KEY_CURRENT;
 import static co.lunarlunacy.accountabilibuddy.providers.DatabaseContract.Mission.KEY_DESC;
@@ -19,27 +18,20 @@ import static co.lunarlunacy.accountabilibuddy.providers.DatabaseContract.Missio
 /**
  * Created by willepstein on 1/9/16.
  */
-public class MissionDAO {
-
-    private final Context context;
-    private final DatabaseHelper dbHelper;
+public class MissionDAO extends BaseDAO<Mission> {
 
     public MissionDAO(Context context) {
-        this.context = context;
-        this.dbHelper = new DatabaseHelper(context);
+        super(context);
     }
 
+    @Override
     public Mission get(long missionId) {
         SQLiteDatabase db = dbHelper.getReadableDatabase();
         Cursor cursor = db.query(TABLE_NAME, null, _ID + "=?", new String[]{Long.toString(missionId)}, null, null, null);
 
         Mission result = null;
         if(cursor.moveToFirst()) {
-            result = new Mission();
-            result.setId(cursor.getLong(cursor.getColumnIndex(_ID)));
-            result.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
-            result.setDescription(cursor.getString(cursor.getColumnIndex(KEY_DESC)));
-            result.setCurrent(cursor.getInt(cursor.getColumnIndex(KEY_CURRENT)) > 0);
+            result = read(cursor);
         }
 
         cursor.close();
@@ -53,12 +45,7 @@ public class MissionDAO {
         Cursor cursor = db.query(TABLE_NAME, null, null, null, null, null, null);
 
         while(cursor.moveToNext()) {
-            Mission mission = new Mission();
-            mission.setId(cursor.getLong(cursor.getColumnIndex(_ID)));
-            mission.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
-            mission.setDescription(cursor.getString(cursor.getColumnIndex(KEY_DESC)));
-            mission.setCurrent(cursor.getInt(cursor.getColumnIndex(KEY_CURRENT)) > 0);
-            result.add(mission);
+            result.add(read(cursor));
         }
 
         cursor.close();
@@ -66,10 +53,40 @@ public class MissionDAO {
         return result;
     }
 
-    /**
-     * Called when the user clicks the Save button
-     * @return new mission id
-     */
+    public Mission getCurrent() {
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor cursor = db.query(TABLE_NAME, null, KEY_CURRENT + ">0", null, null, null, null);
+
+        if(cursor != null && cursor.moveToFirst()) {
+            return read(cursor);
+        }
+        return null;
+    }
+
+    public Mission setCurrent(long id) {
+        unsetCurrent();
+
+        Mission newCurrent = get(id);
+        if(newCurrent != null) {
+            newCurrent.setCurrent(true);
+            update(newCurrent);
+        }
+        return null;
+    }
+
+    public Mission setCurrent(Mission mission) {
+        return setCurrent(mission.getId());
+    }
+
+    private void unsetCurrent() {
+        Mission current = getCurrent();
+        if(current != null) {
+            current.setCurrent(false);
+            update(current);
+        }
+    }
+
+    @Override
     public long insert(Mission mission) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
@@ -83,7 +100,8 @@ public class MissionDAO {
         return missionId;
     }
 
-    public long update(Mission mission) {
+    @Override
+    public void update(Mission mission) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         ContentValues values = new ContentValues();
@@ -92,19 +110,30 @@ public class MissionDAO {
         values.put(KEY_DESC, mission.getDescription());
         values.put(KEY_CURRENT, mission.getCurrent());
 
-        long id = db.update(TABLE_NAME, values, _ID + "=?", new String[]{Long.toString(mission.getId())});
+        db.update(TABLE_NAME, values, _ID + "=?", new String[]{Long.toString(mission.getId())});
         db.close();
-        return id;
     }
 
+    @Override
     public void delete(long id) {
         SQLiteDatabase db = dbHelper.getWritableDatabase();
         db.delete(TABLE_NAME, _ID + "=?", new String[]{Long.toString(id)});
         db.close();
     }
 
+    @Override
     public void delete(Mission mission) {
         delete(mission.getId());
+    }
+
+    @Override
+    protected Mission read(Cursor cursor) {
+        Mission mission = new Mission();
+        mission.setId(cursor.getLong(cursor.getColumnIndex(_ID)));
+        mission.setName(cursor.getString(cursor.getColumnIndex(KEY_NAME)));
+        mission.setDescription(cursor.getString(cursor.getColumnIndex(KEY_DESC)));
+        mission.setCurrent(cursor.getInt(cursor.getColumnIndex(KEY_CURRENT)) > 0);
+        return mission;
     }
 
 }

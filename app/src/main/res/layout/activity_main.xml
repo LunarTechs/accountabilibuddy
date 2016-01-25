@@ -4,67 +4,62 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-
     <LinearLayout
-        android:id="@+id/phone_form"
         android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="openBuddyActivity">
 
-        <EditText android:id="@+id/phone_number_field"
-            android:layout_weight="1"
+        <TextView
+            android:id="@+id/current_buddy"
             android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:hint="@string/prompt_phone"
-            android:inputType="phone" />
+            android:gravity="center"
+            android:minLines="2"
+            android:text="@string/no_buddies"
+            android:textSize="25sp" />
 
         <Button
+            android:id="@+id/add_buddy"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/button_save"
-            android:onClick="savePhone" />
+            android:layout_height="match_parent"
+            android:text="@string/add"
+            android:onClick="openBuddyActivity" />
 
     </LinearLayout>
 
     <LinearLayout
         android:orientation="horizontal"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:onClick="openMissionActivity" >
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/sent_to" />
-
-        <TextView
-            android:id="@+id/saved_number"
-            android:layout_weight="1"
+            android:id="@+id/current_mission"
             android:layout_width="0dp"
+            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal" />
+            android:gravity="center"
+            android:minLines="2"
+            android:text="@string/no_missions"
+            android:textSize="25sp" />
 
         <Button
-            android:id="@+id/clear_button"
+            android:id="@+id/add_mission"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/clear"
-            android:onClick="clearPhone" />
-
-        <Button
-            android:id="@+id/change_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="@string/change"
-            android:onClick="changePhone" />
+            android:layout_height="match_parent"
+            android:text="@string/add"
+            android:onClick="openMissionActivity" />
 
     </LinearLayout>
 
     <EditText
         android:id="@+id/message"
         android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:hint="@string/type_message"/>
+        android:layout_height="wrap_content"
+        android:hint="@string/type_message"
+        android:minLines="5"/>
 
     <Button
         android:id="@+id/send_button"

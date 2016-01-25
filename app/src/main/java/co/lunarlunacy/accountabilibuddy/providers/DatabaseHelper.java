@@ -15,6 +15,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        deleteTables(db);
         db.execSQL(DatabaseContract.Buddy.CREATE_TABLE);
         db.execSQL(DatabaseContract.Mission.CREATE_TABLE);
         db.execSQL(DatabaseContract.MissionBuddy.CREATE_TABLE);
@@ -23,9 +24,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     // TODO should be changed eventually
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL(DatabaseContract.MissionBuddy.DELETE_TABLE);
-        db.execSQL(DatabaseContract.Buddy.DELETE_TABLE);
-        db.execSQL(DatabaseContract.Mission.DELETE_TABLE);
         onCreate(db);
     }
 
@@ -33,5 +31,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         onUpgrade(db, oldVersion, newVersion);
+    }
+
+    private void deleteTables(SQLiteDatabase db) {
+        db.execSQL(DatabaseContract.MissionBuddy.DELETE_TABLE);
+        db.execSQL(DatabaseContract.Buddy.DELETE_TABLE);
+        db.execSQL(DatabaseContract.Mission.DELETE_TABLE);
     }
 }

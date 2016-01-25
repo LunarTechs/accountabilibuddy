@@ -1,42 +1,67 @@
 package co.lunarlunacy.accountabilibuddy.activities;
 
-import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
-import android.telephony.PhoneNumberFormattingTextWatcher;
-import android.telephony.SmsManager;
+import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import co.lunarlunacy.accountabilibuddy.R;
 import co.lunarlunacy.accountabilibuddy.connectors.SmsConnector;
 import co.lunarlunacy.accountabilibuddy.daos.BuddyDAO;
+import co.lunarlunacy.accountabilibuddy.daos.MissionDAO;
 import co.lunarlunacy.accountabilibuddy.models.Buddy;
+import co.lunarlunacy.accountabilibuddy.models.Mission;
 import co.lunarlunacy.accountabilibuddy.utils.Tags;
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends AppCompatActivity {
+
+    private static final int CURRENT_BUDDY_REQUEST = 1;  // The request code
+    private static final int CURRENT_MISSION_REQUEST = 2;  // The request code
 
     private final BuddyDAO buddyDAO = new BuddyDAO(this);
+    private final MissionDAO missionDAO = new MissionDAO(this);
     private final SmsConnector smsConnector = new SmsConnector(this);
+
+    private TextView buddyTextView;
+    private TextView missionTextView;
+    private Buddy currentBuddy;
+    private Mission currentMission;
+
+    private EditText messageText;
+    private Button sendButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Dynamically format input with phone number styling
-        EditText editText = (EditText) findViewById(R.id.phone_number_field);
-        editText.addTextChangedListener(new PhoneNumberFormattingTextWatcher());
+        buddyTextView = (TextView) findViewById(R.id.current_buddy);
+        currentBuddy = buddyDAO.getCurrent();
+        if(currentBuddy != null) {
+            buddyTextView.setText(Html.fromHtml(currentBuddy.getName() + "<br/><small>" + currentBuddy.getPhone() + "</small>"));
+        }
 
-        bindUI();
+        missionTextView = (TextView) findViewById(R.id.current_mission);
+        currentMission = missionDAO.getCurrent();
+        if(currentMission != null) {
+            missionTextView.setText(Html.fromHtml(currentMission.getName() + "<br/><small>" + currentMission.getDescription() + "</small>"));
+        }
+
+        sendButton = (Button) findViewById(R.id.send_button);
+        sendButton.setEnabled(isSendButtonEnabled());
+
+        messageText = (EditText) findViewById(R.id.message);
+    }
+
+    private boolean isSendButtonEnabled() {
+        return currentBuddy != null && currentMission != null;
     }
 
     @Override
@@ -65,10 +90,24 @@ public class MainActivity extends ActionBarActivity {
      * Called when the user clicks the Send button
      */
     public void sendMessage(View view) {
-        EditText editText = (EditText) findViewById(R.id.message);
-        String message = editText.getText().toString();
+        String message = messageText.getText().toString();
         String messageToSend = appendAppName(message);
-        smsConnector.sendSMS(buddyDAO.loadPhone().getPhoneNumber(), messageToSend);
+
+        if(currentBuddy == null || currentMission == null) {
+            makeErrorToast("Choose a buddy and mission");
+            return;
+        }
+        if(message.isEmpty()) {
+            makeErrorToast("Enter a message");
+            return;
+        }
+
+        smsConnector.sendSMS(currentBuddy.getPhone(), messageToSend);
+    }
+
+    //TODO put these toasts somewhere generic
+    private void makeErrorToast(String error) {
+        Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
     }
 
     private String appendAppName(String message) {
@@ -76,76 +115,41 @@ public class MainActivity extends ActionBarActivity {
     }
 
     /**
-     * Called when the user clicks the Save button. <br>
-     * Binds UI again
+     * Called when a user clicks the buddy layout
      */
-    public void savePhone(View view) {
-        String phoneNumber = readPhone();
-        // TODO add blank phoneNumber checking
-        Buddy buddy = new Buddy(phoneNumber);
-        buddyDAO.savePhone(buddy);
-        bindUI();
+    public void openBuddyActivity(View view) {
+        Intent intent = new Intent(getApplicationContext(), BuddyActivity.class);
+        startActivityForResult(intent, CURRENT_BUDDY_REQUEST);
     }
 
     /**
-     * Called when the user clicks the Clear button <br>
-     * Binds UI again
+     * Called when a user clicks the mission layout
      */
-    public void clearPhone(View view) {
-        buddyDAO.deletePhone();
-        bindUI();
+    public void openMissionActivity(View view) {
+        Intent intent = new Intent(getApplicationContext(), MissionActivity.class);
+        startActivityForResult(intent, CURRENT_MISSION_REQUEST);
     }
 
-    /**
-     * Called when the user hits the Change button
-     */
-    public void changePhone(View view) {
-        LinearLayout phonePrompt = (LinearLayout) findViewById(R.id.phone_form);
-        phonePrompt.setVisibility(View.VISIBLE);
-
-        Button changeButton = (Button) findViewById(R.id.change_button);
-        changeButton.setVisibility(View.GONE);
-        Button clearButton = (Button) findViewById(R.id.clear_button);
-        clearButton.setVisibility(View.VISIBLE);
-    }
-
-    private String readPhone() {
-        EditText editText = (EditText) findViewById(R.id.phone_number_field);
-        return editText.getText().toString();
-    }
-
-    private void bindUI() {
-        Buddy buddy = buddyDAO.loadPhone();
-
-        TextView savedPhone = (TextView) findViewById(R.id.saved_number);
-        LinearLayout phonePrompt = (LinearLayout) findViewById(R.id.phone_form);
-        Button changeButton = (Button) findViewById(R.id.change_button);
-        EditText message = (EditText) findViewById(R.id.message);
-        Button sendButton = (Button) findViewById(R.id.send_button);
-
-        if(buddy.getPhoneNumber() != null) {
-            savedPhone.setText(buddy.getPhoneNumber());
-
-            phonePrompt.setVisibility(View.GONE);
-
-            changeButton.setVisibility(View.VISIBLE);
-
-            message.setVisibility(View.VISIBLE);
-            sendButton.setVisibility(View.VISIBLE);
-        } else {
-            savedPhone.setText(R.string.none);
-
-            phonePrompt.setVisibility(View.VISIBLE);
-
-            changeButton.setVisibility(View.GONE);
-
-            message.setVisibility(View.INVISIBLE);
-            sendButton.setVisibility(View.INVISIBLE);
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == CURRENT_BUDDY_REQUEST) {
+            if (resultCode == RESULT_OK) {
+                currentBuddy = (Buddy) data.getParcelableExtra(Tags.CURRENT_BUDDY.getLongName());
+                if(currentBuddy != null) {
+                    buddyTextView.setText(Html.fromHtml(currentBuddy.getName() + "<br/><small>" + currentBuddy.getPhone() + "</small>"));
+                }
+                sendButton.setEnabled(isSendButtonEnabled());
+            }
+        } else if(requestCode == CURRENT_MISSION_REQUEST) {
+            if(resultCode == RESULT_OK) {
+                currentMission = (Mission) data.getParcelableExtra(Tags.CURRENT_MISSION.getLongName());
+                if(currentMission != null) {
+                    missionTextView.setText(Html.fromHtml(currentMission.getName() + "<br/><small>" + currentMission.getDescription() + "</small>"));
+                }
+                sendButton.setEnabled(isSendButtonEnabled());
+            }
         }
-        Button clearButton = (Button) findViewById(R.id.clear_button);
-        clearButton.setVisibility(View.GONE);
-        EditText phoneTextField = (EditText) phonePrompt.findViewById(R.id.phone_number_field);
-        phoneTextField.setText("");
     }
 
 }
