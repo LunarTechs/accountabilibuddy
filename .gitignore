@@ -5,3 +5,16 @@
 .DS_Store
 /build
 /captures
+
+#Eclipse
+.project
+.classpath
+.settings
+.checkstyle
+
+#IntelliJ IDEA
+.idea
+*.iml
+*.ipr
+*.iws
+
